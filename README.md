@@ -3,7 +3,7 @@ _Super Duper Simple Messaging Service_
 
 ## Getting started
 
-### Something
+### Install 
 ### Building 
 ### Seeding Data for Testing
 
