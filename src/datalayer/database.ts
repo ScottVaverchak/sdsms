@@ -1,6 +1,8 @@
 // @TODO(sjv): Using a very basic in memory DB for now
-
 import { v4 } from 'uuid'
+
+const unixTimeStamp = () => Math.floor(new Date().getTime() / 1e3)
+const thirtyDaysAgo = () => unixTimeStamp() - (30 * 24 * 60 * 60)
 
 // @TODO(sjv): Types should be somewhere else
 export type Message = { 
@@ -21,7 +23,18 @@ type internalDb = {
     users: User[]
 }
 
-const __db = { messages: [], users: [] } as internalDb
+// Preseeded data
+const __db = { 
+    messages: [
+        { id: v4(), sender_id: '456', recv_id: '123', message: 'wanna come over and talk about hobbits?', creation: thirtyDaysAgo() - (1 * 24 * 60 * 60 )},
+        { id: v4(), sender_id: '456', recv_id: '123', message: 'don\'t forget your staff!', creation: thirtyDaysAgo() + (1 * 24 * 60 * 60 )},
+    ], 
+    users: [
+        { id: '123', name: 'Gandalf' },
+        { id: '456', name: 'Saruman' },
+        { id: '789', name: 'Radagast'}
+    ] 
+} as internalDb
 
 // @NOTE(sjv): Interface to allow me more flexibility down the road
 // Naming could be better, this is technically an abstraction above
@@ -36,8 +49,6 @@ export interface IDatabase {
     getUser: (user_id: string) => Result<User, string>
 }
 
-const unixTimeStamp = () => new Date().getTime() / 1e3
-const thirtyDaysAgo = () => unixTimeStamp() - (30 * 24 * 60 * 60)
 
 export class Database implements IDatabase { 
     insertMessage(sender_id: string, recv_id: string, message: string): Result<void, string> { 
@@ -50,6 +61,7 @@ export class Database implements IDatabase {
         // @NOTE(sjv): This should be completed on the DB rather than in the server
         // A good DB will do this faster than ts
         const thirtyDays = thirtyDaysAgo()
+        // @NTODO(sjv): We should sort these by creation
         const messages = __db.messages
             .filter(m => m.recv_id === user_id && m.creation > thirtyDays)
             .slice(0, 100)
@@ -59,6 +71,7 @@ export class Database implements IDatabase {
 
     getMessagesFromUser(user_id: string, from_id: string): Result<Message[], string> {
         const thirtyDays = thirtyDaysAgo()
+        // @NTODO(sjv): We should sort these by creation
         const messages = __db.messages
             .filter(m => (m.recv_id === user_id && m.sender_id === from_id) && m.creation > thirtyDays)
             .slice(0, 100)
