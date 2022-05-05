@@ -21,9 +21,9 @@ export interface IDatabase {
 
     insertMessage: (sender_id: string, recv_id: string, message: string) => Result<number, string>
 
-    getAllMessages: (user_id: string) => Result<Message[], string> 
+    getMessages: (user_id: string) => Result<Message[], string> 
 
-    getAllMessagesFromUser: (user_id: string, from_id: string) => Result<Message[], string>
+    getMessagesFromUser: (user_id: string, from_id: string) => Result<Message[], string>
 
     getUser: (user_id: string) => Result<User, string>
 }
